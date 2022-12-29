@@ -1,18 +1,20 @@
 <template>
     <nav class="navbar navbar-dark bg-primary justify-content-between mb-4 px-4">
-        <a class="navbar-brand" href="#">者也专栏</a>
+        <router-link :to="{name:'home'}" class="navbar-brand">者也专栏</router-link>
         <ul v-if="!user.isLogin" class="list-inline mb0">
             <li class="list-inline-item">
-                <a href="#" class="btn btn-outline-light my2">登录</a>
+                <router-link :to="{name:'login'}" href="#" class="btn btn-outline-light my2">登录</router-link>
             </li>
             <li class="list-inline-item">
-                <a href="#" class="btn btn-outline-light my2">注册</a>
+                <router-link :to="{name:'login'}" href="#" class="btn btn-outline-light my2">注册</router-link>
             </li>
         </ul>
         <ul v-else class="list-inline mb0">
             <li class="list-inline-item">
                 <DropDown :title="`你好！${user.name}`">
-                    <DropDownItem><a href="#" class="dropdown-item">新建文章</a></DropDownItem>
+                    <DropDownItem>
+                        <router-link :to="{name:'create'}" class="dropdown-item">新建文章</router-link>
+                    </DropDownItem>
                     <DropDownItem disabled><a href="#" class="dropdown-item">编辑资料</a></DropDownItem>
                     <DropDownItem><a href="#" class="dropdown-item">退出登录</a></DropDownItem>
                 </DropDown>
@@ -26,11 +28,7 @@
 import { defineComponent, PropType } from 'vue'
 import DropDown from './DropDown.vue'
 import DropDownItem from './DropDownItem.vue'
-export interface UserProps {
-    isLogin: boolean
-    name?: string
-    id?: string
-}
+import { UserProps } from '../store'
 export default defineComponent({
     name: 'GlobalHeader',
     components: {

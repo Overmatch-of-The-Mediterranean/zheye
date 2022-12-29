@@ -1,7 +1,8 @@
 <template>
     <!-- input框及错误提示 -->
     <div class="validate-input-container pb-3">
-        <input type="text" v-bind="$attrs" class="form-control" :class="{'is-invalid': inputRef.error}" :value="inputRef.val" @input="updateValue" @blur="validateInput">
+        <input v-if="tag === 'input'" type="text" v-bind="$attrs" class="form-control" :class="{'is-invalid': inputRef.error}" :value="inputRef.val" @input="updateValue" @blur="validateInput">
+        <textarea v-else type="text" v-bind="$attrs" class="form-control" :class="{'is-invalid': inputRef.error}" :value="inputRef.val" @input="updateValue" @blur="validateInput"></textarea>
         <span v-if="inputRef.error" class="invalid-feedback">{{inputRef.message}}</span>
     </div>
 </template>
@@ -14,14 +15,19 @@ export interface RuleProp {
     type: 'required' | 'email' | 'passWord'
     message: string
 }
-type RulesProp = RuleProp[]
+type tag = 'input' | 'textarea' // 用来判断使用input还是textarea
+export type RulesProp = RuleProp[]
 export default defineComponent({
     name: 'ValidateInput',
     // 禁止attribute继承到根组件，用于向组件传递属性，将传递的属性绑定到组件内某个元素上
     inheritAttrs: false,
     props: {
         rules: Array as PropType<RulesProp>,
-        modelValue: String
+        modelValue: String,
+        tag: {
+            type: String as PropType<tag>,
+            default: 'input'
+        }
     },
     setup(props, context) {
         const inputRef = reactive({
