@@ -1,49 +1,125 @@
-import { createStore } from 'vuex'
-import { testData, testPosts, ColumnProps, PostProps } from './testData'
+import { createStore, Commit, Dispatch } from 'vuex'
+import axios from 'axios'
 
 export interface UserProps{
     isLogin:boolean,
-    name?:string,
-    id?:number,
-    columnId?:number
+    nickName?:string,
+    _id?:string,
+    column?:string,
+    email?:string
 }
+interface ImageProps {
+    _id?:string,
+    url?:string,
+    createAt?:string
+}
+export interface ColumnProps {
+    _id: string;
+    title: string;
+    avatar?: ImageProps;
+    description: string;
+  }
+  export interface PostProps {
+    _id: string;
+    title: string;
+    excerpt?:string
+    content?: string;
+    image?: ImageProps;
+    createdAt: string;
+    column: string;
+  }
 export interface GlobalProps {
+    token:string,
+    loading:boolean,
     columns:ColumnProps[],
     posts:PostProps[],
     user:UserProps
 }
 
+const getAndCommit = async(url:string, mutationName:string, commit:Commit) => {
+    const { data } = await axios.get(url)
+    commit(mutationName, data)
+}
+const postAndCommit = async(url:string, mutationName:string, commit:Commit, payLoad:any) => {
+    const { data } = await axios.post(url, payLoad)
+    commit(mutationName, data)
+    return data
+}
 const state:GlobalProps = {
-    columns: testData,
-    posts: testPosts,
+    token: '',
+    loading: false,
+    columns: [],
+    posts: [],
     user: {
         isLogin: false
     }
 }
 
 const mutations = {
-    login(state:GlobalProps) {
-        state.user = { ...state.user, isLogin: true, name: 'viking', columnId: 1 }
-    },
     createPost(state:GlobalProps, newPost:any) {
         state.posts.push(newPost)
+    },
+    fetchColumns(state:GlobalProps, res:any) {
+        state.columns = res.data.list
+    },
+    fetchColumn(state:GlobalProps, res:any) {
+        state.columns = [res.data]
+    },
+    fetchPosts(state:GlobalProps, res:any) {
+        state.posts = res.data.list
+    },
+    setLoading(state:GlobalProps, status:boolean) {
+        state.loading = status
+    },
+    login(state:GlobalProps, res:any) {
+        state.token = res.data.token
+        axios.defaults.headers.common.Authorization = `Bearer ${state.token}`
+        return res
+    },
+    fetchCurrentUser(state:GlobalProps, rowData:any) {
+        state.user = { isLogin: true, ...rowData.data }
     }
 }
 
+const actions = {
+    fetchColumns({ commit }:{commit:Commit}) {
+        getAndCommit('/column', 'fetchColumns', commit)
+    },
+    fetchColumn({ commit }:{commit:Commit}, cid:string) {
+         getAndCommit(`/column/${cid}`, 'fetchColumn', commit)
+    },
+    fetchPosts({ commit }:{commit:Commit}, cid:string) {
+        getAndCommit(`/column/${cid}/posts`, 'fetchPosts', commit)
+    },
+    fetchCurrentUser({ commit }:{commit:Commit}) {
+        getAndCommit('/login/current', 'fetchCurrentUser', commit)
+    },
+    login({ commit }:{commit:Commit}, payLoad:any) {
+        postAndCommit('/user/login', 'login', commit, payLoad)
+    },
+    loginAndFetch({ dispatch }:{dispatch:Dispatch}, payLoad:any) {
+        // 登录获取token并设置headers
+        return dispatch('login', payLoad).then(() => {
+            // 存储用户信息用于展示
+            return dispatch('fetchCurrentUser')
+        })
+    }
+}
 const getters = {
     // 获取专栏数据
-    getColumnsById: (state:GlobalProps) => (id:number) => {
-        return state.columns.find(column => column.id === id)
+    getColumnsById: (state:GlobalProps) => (id:string) => {
+        return state.columns.find(column => column._id === id)
     },
     // 获取文章数据
-    getPostsByCid: (state:GlobalProps) => (cid:number) => {
-        return state.posts.filter(post => post.columnId === cid)
+    getPostsByCid: (state:GlobalProps) => (cid:string) => {
+        return state.posts.filter(post => post.column === cid)
     }
 }
 const store = createStore({
     state,
     mutations,
-    getters
+    getters,
+    actions
 })
 
 export default store

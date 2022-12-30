@@ -11,7 +11,7 @@
         </ul>
         <ul v-else class="list-inline mb0">
             <li class="list-inline-item">
-                <DropDown :title="`你好！${user.name}`">
+                <DropDown :title="`你好！${user.nickName}`">
                     <DropDownItem>
                         <router-link :to="{name:'create'}" class="dropdown-item">新建文章</router-link>
                     </DropDownItem>
@@ -44,4 +44,4 @@ export default defineComponent({
 })
 </script>
 
-<style lang="scss"></style>
+<style></style>

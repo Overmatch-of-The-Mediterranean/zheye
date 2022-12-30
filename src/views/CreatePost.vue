@@ -21,8 +21,8 @@
 import { defineComponent, ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
-import { GlobalProps } from '@/store'
-import { PostProps } from '@/testData'
+import { GlobalProps, PostProps } from '@/store'
+
 import ValidateInput, { RulesProp } from '../components/ValidateInput.vue'
 import ValidateForm from '../components/ValidateForm.vue'
 
@@ -48,17 +48,17 @@ export default defineComponent({
         // 提交后，创建文章并跳转到column/:id页面
         const onFormSubmit = (value: boolean) => {
             if (value) {
-                const { columnId } = store.state.user
-                if (columnId) {
+                const { column } = store.state.user
+                if (column) {
                     const newPost: PostProps = {
-                        id: new Date().getTime(),
+                        _id: new Date().getTime().toString(),
                         title: titleVal,
                         content: contentVal,
                         createdAt: new Date().toLocaleString(),
-                        columnId: columnId
+                        column: column
                     }
                     store.commit('createPost', newPost)
-                    router.push({ name: 'column', params: { id: columnId } })
+                    router.push({ name: 'column', params: { id: column } })
                 }
             }
         }

@@ -2,6 +2,7 @@
     <div class="container">
         <!-- 头部 -->
         <GlobalHeader :user="CurrentUser" />
+        <LoadingView v-if="false" />
         <router-view></router-view>
         <footer class="text-center py-4 text-secondary bg-light mt-6">
             <small>
@@ -22,20 +23,24 @@ import { defineComponent, computed } from 'vue'
 import { useStore } from 'vuex'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import GlobalHeader from './components/GlobalHeader.vue'
+import LoadingView from './components/LoadingView.vue'
 import { GlobalProps } from './store'
 export default defineComponent({
     name: 'App',
     components: {
-        GlobalHeader
+        GlobalHeader,
+        LoadingView
     },
     setup() {
         const store = useStore<GlobalProps>()
         // 获取ValidateInput组件
         const CurrentUser = computed(() => store.state.user)
+        const isLoading = computed(() => store.state.loading)
 
         return {
             // list: testList,
-            CurrentUser
+            CurrentUser,
+            isLoading
         }
     }
 })

@@ -51,10 +51,14 @@ export default defineComponent({
         console.log(store.state.user)
         // 提交表单后，后续的操作
         const onFormSubmit = (value: boolean) => {
-            console.log(store.state.user)
             if (value) {
-                router.push('/')
-                store.commit('login')
+                const payLoad = {
+                    email: emailVal.value,
+                    passWord: passWordVal.value
+                }
+                store.dispatch('loginAndFetch', payLoad).then(() => {
+                    router.push('/')
+                })
             }
         }
         return {
