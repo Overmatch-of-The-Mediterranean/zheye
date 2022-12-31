@@ -12,7 +12,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onUnmounted } from 'vue'
+import { defineComponent } from 'vue'
+import useCreateDom from '@/hooks/useCreateDom'
 export default defineComponent({
     name: 'LoadingView',
     props: {
@@ -20,12 +21,7 @@ export default defineComponent({
         background: String
     },
     setup() {
-        const node = document.createElement('div')
-        node.id = 'back'
-        document.body.appendChild(node)
-        onUnmounted(() => {
-            document.body.removeChild(node)
-        })
+        useCreateDom('back')
     }
 })
 </script>

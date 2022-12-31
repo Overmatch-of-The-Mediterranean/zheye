@@ -29,6 +29,8 @@ export default defineComponent({
     setup(props) {
         // 专栏图片是否存在的处理
         const columnList = computed(() => {
+            console.log('proplist', props.list)
+
             return props.list.map(column => {
                 if (!column.avatar) {
                     // 不存在，则使用指定的图片

@@ -8,7 +8,12 @@ export interface UserProps{
     column?:string,
     email?:string
 }
-interface ImageProps {
+export interface ResponseType<P> {
+    code:number,
+    msg:string,
+    data:P
+}
+export interface ImageProps {
     _id?:string,
     url?:string,
     createAt?:string
@@ -28,7 +33,12 @@ export interface ColumnProps {
     createdAt: string;
     column: string;
   }
+  export interface GlobalErrorProps{
+    status:boolean,
+    message?:string
+  }
 export interface GlobalProps {
+    error:GlobalErrorProps,
     token:string,
     loading:boolean,
     columns:ColumnProps[],
@@ -39,6 +49,7 @@ export interface GlobalProps {
 const getAndCommit = async(url:string, mutationName:string, commit:Commit) => {
     const { data } = await axios.get(url)
     commit(mutationName, data)
+    return data
 }
 const postAndCommit = async(url:string, mutationName:string, commit:Commit, payLoad:any) => {
     const { data } = await axios.post(url, payLoad)
@@ -46,6 +57,9 @@ const postAndCommit = async(url:string, mutationName:string, commit:Commit, payL
     return data
 }
 const state:GlobalProps = {
+    error: {
+        status: false
+    },
     token: '',
     loading: false,
     columns: [],
@@ -60,7 +74,8 @@ const mutations = {
         state.posts.push(newPost)
     },
     fetchColumns(state:GlobalProps, res:any) {
-        state.columns = res.data.list
+        state.columns = res.data
+        console.log('res===>', res.data)
     },
     fetchColumn(state:GlobalProps, res:any) {
         state.columns = [res.data]
@@ -78,21 +93,24 @@ const mutations = {
     },
     fetchCurrentUser(state:GlobalProps, rowData:any) {
         state.user = { isLogin: true, ...rowData.data }
+    },
+    setError(state:GlobalProps, e:GlobalErrorProps) {
+        state.error = e
     }
 }
 
 const actions = {
     fetchColumns({ commit }:{commit:Commit}) {
-        getAndCommit('/column', 'fetchColumns', commit)
+        return getAndCommit('/column', 'fetchColumns', commit)
     },
     fetchColumn({ commit }:{commit:Commit}, cid:string) {
-         getAndCommit(`/column/${cid}`, 'fetchColumn', commit)
+        return getAndCommit(`/column/${cid}`, 'fetchColumn', commit)
     },
     fetchPosts({ commit }:{commit:Commit}, cid:string) {
-        getAndCommit(`/column/${cid}/posts`, 'fetchPosts', commit)
+        return getAndCommit(`/column/${cid}/posts`, 'fetchPosts', commit)
     },
     fetchCurrentUser({ commit }:{commit:Commit}) {
-        getAndCommit('/login/current', 'fetchCurrentUser', commit)
+        return getAndCommit('/login/current', 'fetchCurrentUser', commit)
     },
     login({ commit }:{commit:Commit}, payLoad:any) {
         postAndCommit('/user/login', 'login', commit, payLoad)

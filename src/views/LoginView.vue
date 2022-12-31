@@ -24,6 +24,7 @@ import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import ValidateInput, { RuleProp } from '../components/ValidateInput.vue'
 import ValidateForm from '../components/ValidateForm.vue'
+import createMessage from '@/components/useCreateMessage'
 import 'bootstrap/dist/css/bootstrap.min.css'
 export default defineComponent({
     name: 'LoginView',
@@ -44,7 +45,7 @@ export default defineComponent({
         // 密码验证规则
         const passWordRules: RuleProp[] = [
             { type: 'required', message: '密码不能为空' },
-            { type: 'passWord', message: '请输入正确的密码格式' }
+            { type: 'custom', message: '请输入正确的密码格式' }
         ]
         // 获取ValidateInput组件
         const inputRef = ref<any>()
@@ -56,9 +57,18 @@ export default defineComponent({
                     email: emailVal.value,
                     passWord: passWordVal.value
                 }
-                store.dispatch('loginAndFetch', payLoad).then(() => {
-                    router.push('/')
-                })
+                store
+                    .dispatch('loginAndFetch', payLoad)
+                    .then(() => {
+                        createMessage('登陆成功 2秒后跳转首页', 'success')
+
+                        setTimeout(() => {
+                            router.push('/')
+                        }, 2000)
+                    })
+                    .catch(e => {
+                        console.log(e)
+                    })
             }
         }
         return {

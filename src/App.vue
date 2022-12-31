@@ -19,12 +19,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue'
+import { defineComponent, computed, watch } from 'vue'
 import { useStore } from 'vuex'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import GlobalHeader from './components/GlobalHeader.vue'
 import LoadingView from './components/LoadingView.vue'
 import { GlobalProps } from './store'
+import createMessage from './components/useCreateMessage'
 export default defineComponent({
     name: 'App',
     components: {
@@ -36,11 +37,21 @@ export default defineComponent({
         // 获取ValidateInput组件
         const CurrentUser = computed(() => store.state.user)
         const isLoading = computed(() => store.state.loading)
-
+        const error = computed(() => store.state.error)
+        watch(
+            () => error.value.status,
+            () => {
+                const { message, status } = error.value
+                if (message && status) {
+                    createMessage(message, 'error')
+                }
+            }
+        )
         return {
             // list: testList,
             CurrentUser,
-            isLoading
+            isLoading,
+            error
         }
     }
 })
