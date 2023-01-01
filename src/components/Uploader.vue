@@ -1,11 +1,17 @@
 <template>
     <div class="file-upload">
-        <button class="btn btn-primary" @click.prevent="triggerUpload">
-            <slot v-if="fileStatus === 'loading'" name="loading">正在上传...</slot>
-            <slot v-else-if="fileStatus === 'success'" name="uploaded" :uploadedData="uploadedData">上传成功</slot>
-            <slot v-else>点击上传</slot>
-        </button>
-        <input type="file" ref="fileInput" class="file-input d-none" @change="handleFileChange" />
+        <div class="file-upload-container" @click.prevent="triggerUpload" v-bind="$attrs">
+            <slot v-if="fileStatus === 'loading'" name="loading">
+                <button class="btn btn-primary" disabled>正在上传...</button>
+            </slot>
+            <slot v-else-if="fileStatus === 'success'" name="uploaded" :uploadedData="uploadedData">
+                <button class="btn btn-primary">上传成功</button>
+            </slot>
+            <slot v-else name="default">
+                <button class="btn btn-primary">点击上传</button>
+            </slot>
+        </div>
+        <input type="file" class="file-input d-none" ref="fileInput" @change="handleFileChange">
     </div>
 </template>
 
@@ -23,16 +29,19 @@ export default defineComponent({
         },
         beforeUpload: Function as PropType<CheckFunction>
     },
+    inheritAttrs: false,
     emits: ['file-uploaded', 'file-uploaded-error'],
     setup(props, context) {
         const fileInput = ref<null | HTMLInputElement>(null)
         const fileStatus = ref<UploadStatus>('ready')
         const uploadedData = ref('')
+        // 点击按钮，触发上传弹框
         const triggerUpload = () => {
             if (fileInput.value) {
                 fileInput.value.click()
             }
         }
+        // 上传文件前检查，将表单数据用请求发送到服务器并根据返回结果，改变上传的状态，以便对应不同的视图
         const handleFileChange = (e: Event) => {
             const currentTarget = e.target as HTMLInputElement
             if (currentTarget.files) {

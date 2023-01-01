@@ -16,7 +16,8 @@ export interface ResponseType<P> {
 export interface ImageProps {
     _id?:string,
     url?:string,
-    createAt?:string
+    createAt?:string,
+    fitUrl?: string;
 }
 export interface ColumnProps {
     _id: string;
@@ -29,9 +30,10 @@ export interface ColumnProps {
     title: string;
     excerpt?:string
     content?: string;
-    image?: ImageProps;
+    image?: ImageProps | string; // 对于PostList组件有些问题
     createdAt: string;
     column: string;
+    author?:string
   }
   export interface GlobalErrorProps{
     status:boolean,
@@ -96,6 +98,11 @@ const mutations = {
     },
     setError(state:GlobalProps, e:GlobalErrorProps) {
         state.error = e
+    },
+    logout(state:GlobalProps) {
+        state.token = ''
+        localStorage.removeItem('token')
+        delete axios.defaults.headers.common.Authorization
     }
 }
 
@@ -114,6 +121,9 @@ const actions = {
     },
     login({ commit }:{commit:Commit}, payLoad:any) {
         postAndCommit('/user/login', 'login', commit, payLoad)
+    },
+    createPost({ commit }:{commit:Commit}, payLoad:any) {
+        postAndCommit('/posts', 'createPost', commit, payLoad)
     },
     loginAndFetch({ dispatch }:{dispatch:Dispatch}, payLoad:any) {
         // 登录获取token并设置headers

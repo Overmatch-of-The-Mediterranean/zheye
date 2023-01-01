@@ -11,11 +11,6 @@
                 </div>
             </div>
         </section>
-        <Uploader action="111" :beforeUpload="beforeUpload" @file-uploaded="OnFileUploaded" @file-uploaded-error="OnFileUploadedError">
-            <template #uploaded="dataProps">
-                <img :src="dataProps.uploadedData.data.url" alt="" width="500">
-            </template>
-        </Uploader>
         <h4 class="font-weight-bold text-center">发现精彩</h4>
         <ColumnList :list="list" />
     </div>
@@ -25,12 +20,10 @@
 import { defineComponent, computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import ColumnList from '@/components/ColumnList.vue'
-import { GlobalProps, ResponseType, ImageProps } from '@/store'
-import createMessage from '@/components/useCreateMessage'
-import Uploader from '@/components/Uploader.vue'
+import { GlobalProps } from '@/store'
 export default defineComponent({
     name: 'HomeView',
-    components: { ColumnList, Uploader },
+    components: { ColumnList },
     props: {
         disabled: {
             type: Boolean,
@@ -43,26 +36,27 @@ export default defineComponent({
             store.dispatch('fetchColumns')
         })
         const list = computed(() => store.state.columns)
-        const beforeUpload = (file: File) => {
-            const isJPG = file.type === 'image/jpeg'
-            console.log(file)
+        // 上传前图片格式的检查
+        // const beforeUpload = (file: File) => {
+        //     const isJPG = file.type === 'image/jpeg'
+        //     console.log(file)
 
-            if (!isJPG) {
-                createMessage('上传图片只能是 JPG 格式', 'error')
-            }
-            return isJPG
-        }
-        const OnFileUploaded = (rowData: ResponseType<ImageProps>) => {
-            createMessage(`上传图片ID: ${rowData.data._id}`, 'success')
-        }
-        const OnFileUploadedError = () => {
-            createMessage('上传图片失败', 'error')
-        }
+        //     if (!isJPG) {
+        //         createMessage('上传图片只能是 JPG 格式', 'error')
+        //     }
+        //     return isJPG
+        // }
+        // const OnFileUploaded = (rowData: ResponseType<ImageProps>) => {
+        //     createMessage(`上传图片ID: ${rowData.data._id}`, 'success')
+        // }
+        // const OnFileUploadedError = () => {
+        //     createMessage('上传图片失败', 'error')
+        // }
         return {
-            list,
-            beforeUpload,
-            OnFileUploaded,
-            OnFileUploadedError
+            list
+            // beforeUpload,
+            // OnFileUploaded,
+            // OnFileUploadedError
         }
     }
 })
